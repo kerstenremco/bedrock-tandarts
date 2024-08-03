@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="card bg-base-100 w-96 shadow-xl">
+        <figure>
+          <img
+            src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+            alt="Shoes" />
+        </figure>
+        <input type="file" class="file-input w-full max-w-xs" id="file"/>
+    <button class="btn" id="button">Uploaden</button>
+        <div class="card-body">
+          <h2 class="card-title">
+            RekenTand
+            <div class="badge badge-secondary">BETA</div>
+          </h2>
+          <p>AI hulp bij je tandartsrekening</p>
+          <p id="answer"></p>
+          <span class="loading loading-dots loading-xs hidden" id="loading"></span>
+          <!-- <div class="card-actions justify-end">
+            
+            <div class="badge badge-outline">Products</div>
+          </div> -->
+        </div>
+      </div>
+</body>
+</html>

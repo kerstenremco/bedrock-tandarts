@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  LogGroup:
+    Properties:
+      LogGroupName: bedrock-tandarts-logs
+      RetentionInDays: 7
+    Type: "AWS::Logs::LogGroup"
+  Role:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "role-bedrock-tandarts"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "role-bedrock-tandarts-lambdaexecution"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
+        - PolicyName: "role-bedrock-tandarts-bedrockexecution"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "bedrock:InvokeModel"
+                  - "bedrock:RetrieveAndGenerate"
+                  - "bedrock:Retrieve"
+                Resource: "arn:aws:bedrock:us-east-1:*"
+  Lambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: "bedrock-tandarts-api"
+      Runtime: python3.12
+      Timeout: 30
+      LoggingConfig:
+        LogGroup: !Ref LogGroup
+      Role: !GetAtt Role.Arn
+      Handler: app.handler
+      Code:
+        ZipFile: |
+          print("Hello")
+      Description: The API
+  LambdaUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: NONE
+      InvokeMode: BUFFERED
+      TargetFunctionArn: !Ref Lambda
+      Cors:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - POST
+        AllowHeaders:
+          - "*"
+  LambdaUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref Lambda
+      FunctionUrlAuthType: "NONE"
+      Action: lambda:InvokeFunctionUrl
+      Principal: "*"

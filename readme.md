@@ -1,0 +1,3 @@
+- Create knowledge base in Bedrock -> Pinecone
+- Deploy stack
+- Update index.py
