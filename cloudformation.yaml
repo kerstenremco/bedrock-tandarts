@@ -2,13 +2,13 @@ AWSTemplateFormatVersion: "2010-09-09"
 Resources:
   LogGroup:
     Properties:
-      LogGroupName: bedrock-tandarts-logs
+      LogGroupName: bedrock-dentibot-logs
       RetentionInDays: 7
     Type: "AWS::Logs::LogGroup"
   Role:
     Type: "AWS::IAM::Role"
     Properties:
-      RoleName: "role-bedrock-tandarts"
+      RoleName: "role-bedrock-dentibot"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -17,7 +17,7 @@ Resources:
               Service: "lambda.amazonaws.com"
             Action: "sts:AssumeRole"
       Policies:
-        - PolicyName: "role-bedrock-tandarts-lambdaexecution"
+        - PolicyName: "role-bedrock-dentibot-lambdaexecution"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -27,7 +27,7 @@ Resources:
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
                 Resource: "arn:aws:logs:*:*:*"
-        - PolicyName: "role-bedrock-tandarts-bedrockexecution"
+        - PolicyName: "role-bedrock-dentibot-bedrockexecution"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -36,11 +36,22 @@ Resources:
                   - "bedrock:InvokeModel"
                   - "bedrock:RetrieveAndGenerate"
                   - "bedrock:Retrieve"
-                Resource: "arn:aws:bedrock:us-east-1:*"
+                Resource: "arn:aws:bedrock:eu-central-1:*"
+        - PolicyName: "role-bedrock-dentibot-dynamodb"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:UpdateItem"
+                Resource: !GetAtt DynamoDB.Arn
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: "bedrock-tandarts-api"
+      FunctionName: "bedrock-dentibot-api"
       Runtime: python3.12
       Timeout: 30
       LoggingConfig:
@@ -71,3 +82,47 @@ Resources:
       FunctionUrlAuthType: "NONE"
       Action: lambda:InvokeFunctionUrl
       Principal: "*"
+  DynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "bedrock-dentibot"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "uid"
+          AttributeType: "S"
+        - AttributeName: "key"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "uid"
+          KeyType: "HASH"
+        - AttributeName: "key"
+          KeyType: "RANGE"
+  HostingBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: "bedrock-dentibot-hosting"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+  HostingBucketPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      PolicyDocument:
+        Id: HostingBucketPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref HostingBucket
+                - /*
+      Bucket: !Ref HostingBucket
