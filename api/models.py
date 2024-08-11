@@ -7,12 +7,12 @@ class Invoice:
     def add_item(self, description, price):
         self.items.append({"description": description, "price": price})
 
-    def get_string(self):
+    def get_string(self, price=False):
         str = ""
         for item in self.items:
             if 'description' in item:
                 s = f"{item['description']}"
-                if 'price' in item:
+                if price and 'price' in item:
                     s += f" ({item['price']})"
                 str += s + ", "
         return str

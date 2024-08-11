@@ -1,6 +1,7 @@
 import json
 import db
 import anthropic
+import knowledge_base
 
 def handle_image(img):
     try:
@@ -22,8 +23,8 @@ def handle_question(uid, question):
     try:
         items = db.get_items(uid)
         history = db.add_history(uid, question)
-        kb = kb.query_knowledge_base(question)
-        response = anthropic.answer(kb, items.get_string(), history)
+        kb = knowledge_base.query_knowledge_base(question)
+        response = anthropic.answer(kb, items.get_string(price=True), history)
         db.add_history(uid, response, assistant=True)
         return {"status_code": 200, "answer": response}
     except Exception as e:

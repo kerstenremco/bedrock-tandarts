@@ -162,5 +162,5 @@ def get_invoice_items(encoded_image):
     if not answer.startswith("[") or not answer.endswith("]"):
         print(answer)
         raise Exception("Invalid response")
-    list_items = json.loads(answer.replace("\n", "").replace(" ", "").strip())
+    list_items = json.loads(answer.replace("\n", "").strip())
     return Invoice(list_items)
