@@ -47,7 +47,7 @@ def check_invoice(encoded_image):
         return True
     if answer == "(NO)":
         return False
-    raise Exception("Invalid response")
+    raise Exception("Invalid response from check_invoice")
 
 def get_invoice_items(encoded_image):
     runtime = boto3.client("bedrock-runtime", region_name="eu-central-1")
@@ -92,7 +92,7 @@ def get_invoice_items(encoded_image):
     # Check if the response is an array
     if not answer.startswith("[") or not answer.endswith("]"):
         print(answer)
-        raise Exception("Invalid response")
+        raise Exception("Invalid response from get_invoice_items")
     list_items = json.loads(answer.replace("\n", "").strip())
     return Invoice(list_items)
 
@@ -133,7 +133,7 @@ def check_invoice_dental(items):
         return True
     if answer == "(NO)":
         return False
-    raise Exception("Invalid response")
+    raise Exception("Invalid response from check_invoice_dental")
 
 def get_explanation_for_item(kb, item):
     runtime = boto3.client("bedrock-runtime", region_name="eu-central-1")
@@ -142,7 +142,7 @@ def get_explanation_for_item(kb, item):
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": 200,
             "temperature": 0.0,
-            "system": f'You are provided to create a short understandable explanation in Dutch for items on a dental invoice. Don\'t mention the code and don\'t talk about prices. Answer the question based on the following information: {kb}.',
+            "system": f'You are provided to create a short easy to understandable explanation with maximum 40 words in Dutch for items on a dental invoice. Don\'t mention the code and don\'t talk about prices. Answer the question based on the following information: {kb}.',
             "messages": [
                 {
                     "role": "user",
@@ -178,7 +178,7 @@ def answer(kb, items, history):
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": 1000,
             "temperature": 0.6,
-            "system": f'You are a dental assistent that explains dental invoices to patients and knows the following information: {kb}. A patient has an invoice with the following items: {items}. Please answer the question of the patient. The patient speaks Dutch. You are only allowed to talk about the invoice items and the knowledge base information. If the patient ask something else just say that you are not allowed to talk about other topics.',
+            "system": f'You are a dental assistent that explains dental invoices to patients and knows the following information: {kb}. A patient has an invoice with the following items: {items}. Answer the patient\'s question in a short and understandable manner. The patient speaks Dutch. You are only allowed to talk about the invoice items and the knowledge base information. If the patient ask something else just say that you are not allowed to talk about other topics.',
             "messages": messages,
         }
     )
@@ -189,6 +189,8 @@ def answer(kb, items, history):
 
     response_body = json.loads(response.get("body").read())
     return response_body['content'][0]['text']
+
+
 
 
     

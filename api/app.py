@@ -41,8 +41,10 @@ def handle_image(img):
             print("Error checking dental: ", e)
             return generate_response(status_code=500, uid=s.uid, error="UNKNOWN")
         # Return uid and items
+        print("FINISCHED IMAGE")
         return generate_response(uid=s.uid, body=s.invoice.items)
     except Exception as e:
+        print("ERROR IMAGE")
         print(e)
         return generate_response(status_code=500, error="UNKNOWN")
     
@@ -50,11 +52,15 @@ def handle_confirmation(uid, confirmed):
     try:
         s = session.Session.load(uid)
         s.confirm(confirmed)
+        print("FINISCHED CONFIRMATION")
         if confirmed:
+            print("INVOICE CONFIRMED")
             return generate_response(uid=s.uid, body=s.invoice.items)
         else:
+            print("INVOICE NOT CONFIRMED")
             return generate_response()
     except Exception as e:
+        print("ERROR CONFIRMATION")
         print(e)
         return generate_response(status_code=500, error="UNKNOWN")
     
@@ -65,20 +71,28 @@ def handle_question(uid, question):
         kb = knowledge_base.query_knowledge_base(question)
         answer = anthropic.answer(kb, s.invoice.get_json_dump(), s.history)
         s.add_history(answer=answer)
+        print("FINISCHED QUESTION")
         return generate_response(uid=s.uid, body=answer)
     except Exception as e:
+        print("ERROR QUESTION")
         print(e)
         return {"status_code": 500, "error": "UNKNOWN"}
 
 def handler(event, *args):
     body = json.loads(event['body'])
     if "image" in body:
+        print("INCOMING IMAGE")
         response = handle_image(body['image'])
         return response
     if "confirmed" in body and "uid" in body:
+        print("INCOMING CONFIRMATION")
         response = handle_confirmation(body['uid'], body['confirmed'])
+        print("FINISCHED CONFIRMATION")
         return response
     if "question" in body and "uid" in body:
+        print("INCOMING QUESTION")
         response = handle_question(body['uid'], body['question'])
+        print("FINISCHED QUESTION")
         return response
+    print("INCOMING UNKNOWN REQUEST")
     return generate_response(status_code=400, error="UNKNOWN_REQUEST")

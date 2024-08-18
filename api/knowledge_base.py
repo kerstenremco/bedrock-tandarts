@@ -13,4 +13,4 @@ def query_knowledge_base(question):
         text = list(map(lambda z: z['content']['text'], answer))
         return ', '.join(text)
     except Exception as e:
-        return f"An error occurred: {str(e)}"
+        return f"An error occurred in query KB: {str(e)}"

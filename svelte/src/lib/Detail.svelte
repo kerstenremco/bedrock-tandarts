@@ -10,7 +10,11 @@
   <div class="items">
     <ul>
       {#each items as item}
-        <li>{item.description}<br /><span>{item.explanation}</span></li>
+        <li>
+          {item.description}<br /><span
+            >{@html item.explanation.replace(/\n/g, "<br>")}</span
+          >
+        </li>
       {/each}
     </ul>
   </div>

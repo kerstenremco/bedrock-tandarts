@@ -61,7 +61,7 @@
     {#each messages as { type, message }, i}
       <div class="{type} messages">
         <div class="message last">
-          {message}
+          {@html message.replace(/\n/g, "<br>")}
         </div>
       </div>
     {/each}
@@ -80,7 +80,9 @@
       bind:this={input}
       on:keydown={(e) => e.key === "Enter" && handleMessage()}
     />
-    <span id="send"><BubbleChatUploadIcon color="#f1f4f3" size="20" /></span>
+    <span id="send" on:click={handleMessage}
+      ><BubbleChatUploadIcon color="#f1f4f3" size="20" /></span
+    >
   </div>
 </div>
 
