@@ -53,7 +53,7 @@ Resources:
     Properties:
       FunctionName: "bedrock-dentibot-api"
       Runtime: python3.12
-      Timeout: 30
+      Timeout: 60
       LoggingConfig:
         LogGroup: !Ref LogGroup
       Role: !GetAtt Role.Arn
@@ -72,6 +72,8 @@ Resources:
         AllowOrigins:
           - "*"
         AllowMethods:
+          - GET
+          - HEAD
           - POST
         AllowHeaders:
           - "*"
@@ -100,7 +102,7 @@ Resources:
   HostingBucket:
     Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: "bedrock-dentibot-hosting"
+      BucketName: "dentibot.remcokersten.nl"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
@@ -126,3 +128,7 @@ Resources:
                 - !Ref HostingBucket
                 - /*
       Bucket: !Ref HostingBucket
+  # DataBucket:
+  #   Type: "AWS::S3::Bucket"
+  #   Properties:
+  #     BucketName: "bedrock-dentibot-data"
