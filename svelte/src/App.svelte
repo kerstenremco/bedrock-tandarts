@@ -3,6 +3,7 @@
   import Upload from "./lib/Upload.svelte";
   import Chat from "./lib/Chat.svelte";
   import logo from "./assets/bot.jpg";
+  import Detail from "./lib/Detail.svelte";
   let screen = "upload";
   let uid;
   let items;
@@ -10,19 +11,19 @@
     screen === "upload" || screen === "result"
       ? "intro-needed"
       : "intro-not-needed";
+  function handleReset() {
+    screen = "upload";
+  }
   function handleUploaded(e) {
     items = e.detail;
     screen = "result";
   }
-  function handleItemsFeedback(e) {
-    const correct = e.detail;
-    if (correct) {
-      screen = "chat";
-    } else {
-      uid = undefined;
-      items = undefined;
-      screen = "upload";
-    }
+  function handleConfirmed(e) {
+    items = e.detail;
+    screen = "detail";
+  }
+  function handleStartChat() {
+    screen = "chat";
   }
 </script>
 
@@ -41,7 +42,14 @@
       {#if screen === "upload"}
         <Upload on:uploaded={handleUploaded} on:uid={(e) => (uid = e.detail)} />
       {:else if screen === "result"}
-        <Items {items} on:feedback={handleItemsFeedback} />
+        <Items
+          {items}
+          {uid}
+          on:confirmed={handleConfirmed}
+          on:reset={handleReset}
+        />
+      {:else if screen === "detail"}
+        <Detail {items} on:chat={handleStartChat} />
       {:else if screen === "chat"}
         <Chat {uid} />
       {/if}
