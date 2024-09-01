@@ -5,16 +5,16 @@ class Invoice:
         self.items = []
         c = 0
         for item in items:
-            if 'description' in item:
+            if 'description' in item and not item['description'] == "":
                 c += 1
                 i = {'id': c}
                 i['description'] = item['description']
                 if 'price' in item:
                     i['price'] = str(item['price'])
                 if 'amount' in item:
-                    i['amount'] = item['amount']
+                    i['amount'] = str(item['amount'])
                 if 'code' in item:
-                    i['code'] = item['code']
+                    i['code'] = str(item['code'])
                 self.items.append(i)
 
     # def add_item(self, description, price):
