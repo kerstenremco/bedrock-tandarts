@@ -3,7 +3,7 @@ Resources:
   LogGroup:
     Properties:
       LogGroupName: bedrock-dentibot-logs
-      RetentionInDays: 7
+      RetentionInDays: 30
     Type: "AWS::Logs::LogGroup"
   Role:
     Type: "AWS::IAM::Role"
